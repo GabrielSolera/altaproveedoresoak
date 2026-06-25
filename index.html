@@ -542,11 +542,14 @@
 </div>
 
 <script>
-// ── CAMPOS REQUERIDOS ──────────────────────────────────────────
+// ── URL DEL WEB APP (reemplazar después de publicar el GAS) ───
+const GAS_URL = 'https://script.google.com/a/macros/oaklatam.com/s/AKfycbxIO4uhJDKyuX6DkQ4tGHHS64T6FSU0_omVR3jLZ7c7EpVHoAJAE2-WqyZjSU9w3fH8Zw/exec';
+
+// ── CAMPOS REQUERIDOS ─────────────────────────────────────────
 const reqs = [
-  { id: 'nombre',  fid: 'f-nombre' },
-  { id: 'pais',    fid: 'f-pais' },
-  { id: 'cuenta',  fid: 'f-cuenta' },
+  { id: 'nombre', fid: 'f-nombre' },
+  { id: 'pais',   fid: 'f-pais'   },
+  { id: 'cuenta', fid: 'f-cuenta' },
 ];
 
 reqs.forEach(({ id, fid }) => {
@@ -569,74 +572,61 @@ function validar() {
   return ok;
 }
 
-// ── GENERAR ID ────────────────────────────────────────────────
+// ── GENERAR ID TEMPORAL ───────────────────────────────────────
 function generarId() {
-  // ID basado en timestamp para unicidad
   const n = Math.floor(Math.random() * 900) + 100;
   return 'PROV-' + n;
 }
 
 // ── CONSTRUIR TEXTO COPY-PASTE ────────────────────────────────
 function construirTexto(datos, id) {
-  const sep = '\t'; // tabulación para pegar directo en Sheets
-  const linea = [
-    id,
-    datos.nombre,
-    datos.pais,
-    datos.cuenta,
-    datos.swift    || '',
-    datos.banco    || '',
-    datos.diasCredito !== '' ? datos.diasCredito : '0',
-  ].join(sep);
+  const sep  = '\t';
+  const fila = [id, datos.nombre, datos.pais, datos.cuenta,
+                 datos.swift || '', datos.banco || '',
+                 datos.diasCredito || '0'].join(sep);
 
-  const texto =
-`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SOLICITUD DE ALTA DE PROVEEDOR — Oakberry Latam
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  return `SOLICITUD DE ALTA DE PROVEEDOR — Oakberry Latam
+================================================
 
-🆔  ID sugerido   : ${id}
-🏢  Razón Social  : ${datos.nombre}
-🌎  País          : ${datos.pais}
-🏦  Cuenta / IBAN : ${datos.cuenta}
-🔀  SWIFT / BIC   : ${datos.swift || '—'}
-🏛️  Banco         : ${datos.banco || '—'}
-💵  Moneda        : ${datos.moneda}
-📅  Días crédito  : ${datos.diasCredito || '0'} días
-${datos.contacto ? `\n👤  Contacto      : ${datos.contacto}` : ''}${datos.telefono ? `\n📞  Teléfono      : ${datos.telefono}` : ''}${datos.emailProv ? `\n✉️  Email         : ${datos.emailProv}` : ''}${datos.notas ? `\n📝  Notas         : ${datos.notas}` : ''}
+ID sugerido   : ${id}
+Razon Social  : ${datos.nombre}
+Pais          : ${datos.pais}
+Cuenta / IBAN : ${datos.cuenta}
+SWIFT / BIC   : ${datos.swift   || '—'}
+Banco         : ${datos.banco   || '—'}
+Moneda        : ${datos.moneda}
+Dias credito  : ${datos.diasCredito || '0'} dias
+${datos.contacto ? 'Contacto      : ' + datos.contacto : ''}
+${datos.telefono ? 'Telefono      : ' + datos.telefono : ''}
+${datos.emailProv ? 'Email prov.   : ' + datos.emailProv : ''}
+${datos.notas    ? 'Notas         : ' + datos.notas : ''}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+================================================
 FILA PARA PEGAR EN GOOGLE SHEETS
-(pegar en la columna A de la hoja Proveedores)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+(columnas: ID | Nombre | Pais | Cuenta | Swift | Banco | Dias Credito)
+================================================
+${fila}
 
-${linea}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Enviado: ${new Date().toLocaleString('es-CR', {timeZone:'America/Costa_Rica'})}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-  return texto;
+Enviado: ${new Date().toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' })}`;
 }
 
 // ── CONSTRUIR HTML DEL CORREO ─────────────────────────────────
 function construirHtmlCorreo(datos, id) {
-  const bans = {'Costa Rica':'🇨🇷','Panama':'🇵🇦','Guatemala':'🇬🇹','El Salvador':'🇸🇻','Internacional':'🌎'};
-  const flag = bans[datos.pais] || '🌎';
-  const sep  = '\t';
-  const fila = [id, datos.nombre, datos.pais, datos.cuenta, datos.swift||'', datos.banco||'', datos.diasCredito||'0'].join(sep);
+  const flags = { 'Costa Rica': 'CR', 'Panama': 'PA', 'Guatemala': 'GT', 'El Salvador': 'SV', 'Internacional': 'INTL' };
+  const flag  = flags[datos.pais] || '';
+  const fila  = [id, datos.nombre, datos.pais, datos.cuenta,
+                  datos.swift || '', datos.banco || '',
+                  datos.diasCredito || '0'].join(' | ');
 
-  return `
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f7f4fa;font-family:'Segoe UI',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4fa;padding:28px 0">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(74,31,96,0.12)">
-
   <tr><td style="background:#280532;padding:28px 32px">
-    <p style="margin:0 0 6px;font-size:10px;color:#b085d0;letter-spacing:2px;text-transform:uppercase">Oakberry Latam · CXP Centroamérica</p>
-    <h1 style="margin:0;color:white;font-size:22px;font-weight:700">🏢 Solicitud de Alta de Proveedor</h1>
+    <p style="margin:0 0 6px;font-size:10px;color:#b085d0;letter-spacing:2px;text-transform:uppercase">Oakberry Latam &middot; CXP Centroamerica</p>
+    <h1 style="margin:0;color:white;font-size:22px;font-weight:700">Solicitud de Alta de Proveedor</h1>
   </td></tr>
-
   <tr><td style="padding:24px 32px 0">
     <table cellpadding="0" cellspacing="0">
       <tr><td style="background:#f3edf7;border-left:4px solid #4a1f60;border-radius:6px;padding:10px 18px">
@@ -645,21 +635,19 @@ function construirHtmlCorreo(datos, id) {
       </td></tr>
     </table>
   </td></tr>
-
   <tr><td style="padding:20px 32px 0">
     <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Datos del Proveedor</p>
     <table width="100%" cellpadding="0" cellspacing="6">
       <tr>
-        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Razón Social</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.nombre}</span></td>
-        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">País</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${flag} ${datos.pais}</span></td>
+        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Razon Social</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.nombre}</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Pais</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">[${flag}] ${datos.pais}</span></td>
       </tr>
       <tr>
-        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Días de Crédito</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.diasCredito||'0'} días</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Dias de Credito</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.diasCredito || '0'} dias</span></td>
         <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Moneda</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.moneda}</span></td>
       </tr>
     </table>
   </td></tr>
-
   <tr><td style="padding:20px 32px 0">
     <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Datos Bancarios</p>
     <table width="100%" cellpadding="0" cellspacing="6">
@@ -668,57 +656,51 @@ function construirHtmlCorreo(datos, id) {
         <span style="font-size:13px;font-weight:600;color:#1a1a2e;font-family:monospace;background:#f7f4fa;padding:4px 8px;border-radius:4px;display:inline-block;margin-top:2px">${datos.cuenta}</span>
       </td></tr>
       <tr>
-        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Banco</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.banco||'—'}</span></td>
-        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">SWIFT / BIC</span><span style="font-size:14px;font-weight:600;color:#1a1a2e;font-family:monospace">${datos.swift||'—'}</span></td>
+        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Banco</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.banco || '—'}</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">SWIFT / BIC</span><span style="font-size:14px;font-weight:600;color:#1a1a2e;font-family:monospace">${datos.swift || '—'}</span></td>
       </tr>
     </table>
   </td></tr>
-
-  ${(datos.contacto||datos.telefono||datos.emailProv) ? `
+  ${datos.contacto || datos.telefono || datos.emailProv ? `
   <tr><td style="padding:20px 32px 0">
     <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Contacto</p>
     <table width="100%" cellpadding="0" cellspacing="6">
       <tr>
-        ${datos.contacto ? `<td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Nombre</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.contacto}</span></td>` : '<td></td>'}
-        ${datos.telefono ? `<td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Teléfono</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.telefono}</span></td>` : '<td></td>'}
+        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Nombre</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.contacto || '—'}</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Telefono</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.telefono || '—'}</span></td>
       </tr>
       ${datos.emailProv ? `<tr><td colspan="2" style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Email</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.emailProv}</span></td></tr>` : ''}
     </table>
   </td></tr>` : ''}
-
   ${datos.notas ? `
   <tr><td style="padding:20px 32px 0">
     <p style="margin:0 0 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Notas</p>
     <p style="margin:0;font-size:12px;color:#4b5563;line-height:1.6;background:#fafaf9;border-radius:6px;padding:10px 12px">${datos.notas}</p>
   </td></tr>` : ''}
-
   <tr><td style="padding:20px 32px">
     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px">
-      <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#92400e">📋 FILA PARA PEGAR EN GOOGLE SHEETS</p>
-      <p style="margin:0 0 8px;font-size:10px;color:#92400e">Copiar y pegar en la columna A de la hoja <strong>Proveedores</strong>:</p>
-      <div style="font-family:monospace;font-size:10px;background:#fef3c7;border-radius:4px;padding:8px 10px;word-break:break-all;color:#1a1a2e">${fila.replace(/\t/g, ' | ')}</div>
-      <p style="margin:8px 0 0;font-size:9px;color:#b45309">Columnas: ID | Nombre | País | Cuenta | Swift | Banco | Días Crédito</p>
+      <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#92400e">FILA PARA PEGAR EN GOOGLE SHEETS</p>
+      <p style="margin:0 0 8px;font-size:10px;color:#92400e">Columnas: ID | Nombre | Pais | Cuenta | Swift | Banco | Dias Credito</p>
+      <div style="font-family:monospace;font-size:10px;background:#fef3c7;border-radius:4px;padding:8px 10px;word-break:break-all;color:#1a1a2e">${fila}</div>
     </div>
   </td></tr>
-
   <tr><td style="background:#280532;padding:14px 32px;text-align:center">
-    <p style="margin:0;font-size:10px;color:#9d7ab8">Oakberry Latam · Sistema de Gestión de Proveedores</p>
-    <p style="margin:3px 0 0;font-size:9px;color:#6b4e8a">Generado automáticamente · No responder a este correo</p>
+    <p style="margin:0;font-size:10px;color:#9d7ab8">Oakberry Latam &middot; Sistema de Gestion de Proveedores</p>
+    <p style="margin:3px 0 0;font-size:9px;color:#6b4e8a">Generado automaticamente &middot; No responder</p>
   </td></tr>
-
 </table>
 </td></tr>
 </table>
 </body></html>`;
 }
 
-// ── ENVÍO ─────────────────────────────────────────────────────
+// ── ENVÍO PRINCIPAL ───────────────────────────────────────────
 let textoFinal = '';
 
 document.getElementById('provForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (!validar()) {
-    document.querySelector('.has-error input, .has-error select').focus();
+    document.querySelector('.has-error input, .has-error select')?.focus();
     return;
   }
 
@@ -740,39 +722,49 @@ document.getElementById('provForm').addEventListener('submit', async function(e)
     notas:       document.getElementById('notas').value.trim(),
   };
 
-  const id = generarId();
-  textoFinal = construirTexto(datos, id);
-  const htmlCorreo = construirHtmlCorreo(datos, id);
+  const id        = generarId();
+  textoFinal      = construirTexto(datos, id);
+  const htmlEmail = construirHtmlCorreo(datos, id);
+  const asunto    = `[Oakberry] Alta de Proveedor: ${datos.nombre} (${id})`;
 
-  // Enviar vía mailto (fallback) — en producción reemplazar con fetch a GAS
-  const asunto = encodeURIComponent(`[Oakberry] Alta de Proveedor: ${datos.nombre} (${id})`);
-  const cuerpo = encodeURIComponent(textoFinal);
+  try {
+    const res = await fetch(GAS_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ asunto, htmlBody: htmlEmail, textoPlano: textoFinal })
+    });
 
-  // Intento de mailto
-  const mailtoLink = `mailto:factura@oaklatam.com?subject=${asunto}&body=${cuerpo}`;
-  window.location.href = mailtoLink;
+    const result = await res.json();
 
-  // Mostrar pantalla de éxito independientemente
-  setTimeout(() => {
-    document.getElementById('formView').style.display = 'none';
-    const sv = document.getElementById('successView');
-    sv.style.display = 'block';
-    document.getElementById('emailPreview').textContent = textoFinal;
+    if (result.success) {
+      mostrarExito(id);
+    } else {
+      throw new Error(result.error || 'Error desconocido');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Hubo un error al enviar. Por favor intentá de nuevo.');
+  } finally {
     btn.disabled = false;
     btn.textContent = 'Enviar solicitud de alta →';
-  }, 600);
+  }
 });
+
+function mostrarExito(id) {
+  document.getElementById('formView').style.display = 'none';
+  const sv = document.getElementById('successView');
+  sv.style.display = 'block';
+  document.getElementById('emailPreview').textContent = textoFinal;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // ── COPIAR TEXTO ──────────────────────────────────────────────
 function copiarTexto() {
   navigator.clipboard.writeText(textoFinal).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '¡Copiado!';
+    btn.textContent = 'Copiado!';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'Copiar';
-      btn.classList.remove('copied');
-    }, 2500);
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2500);
   });
 }
 
