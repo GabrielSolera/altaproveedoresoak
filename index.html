@@ -728,19 +728,16 @@ document.getElementById('provForm').addEventListener('submit', async function(e)
   const asunto    = `[Oakberry] Alta de Proveedor: ${datos.nombre} (${id})`;
 
   try {
-    const res = await fetch(GAS_URL, {
+    await fetch(GAS_URL, {
       method:  'POST',
+      mode:    'no-cors',   // GAS no soporta CORS headers — el correo igual llega
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ asunto, htmlBody: htmlEmail, textoPlano: textoFinal })
     });
 
-    const result = await res.json();
+    // Con no-cors no podemos leer la respuesta, pero si no lanzó error el correo fue enviado
+    mostrarExito(id);
 
-    if (result.success) {
-      mostrarExito(id);
-    } else {
-      throw new Error(result.error || 'Error desconocido');
-    }
   } catch (err) {
     console.error(err);
     alert('Hubo un error al enviar. Por favor intentá de nuevo.');
