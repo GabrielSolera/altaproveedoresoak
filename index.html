@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alta de Proveedor · Oakberry Latam</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --oak:       #4a1f60;
+    --oak-light: #7d5596;
+    --oak-pale:  #f3edf7;
+    --oak-dark:  #280532;
+    --accent:    #b085d0;
+    --text:      #1a1a2e;
+    --muted:     #6b7280;
+    --border:    #e2d9ec;
+    --bg:        #f7f4fa;
+    --white:     #ffffff;
+    --green:     #16a34a;
+    --green-bg:  #f0fdf4;
+    --green-bd:  #bbf7d0;
+    --error:     #dc2626;
+    --error-bg:  #fef2f2;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--oak-dark);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(176,133,208,0.18) 0%, transparent 70%);
+  }
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 36px 24px 32px;
+    position: relative;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .header-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 14px;
+  }
+  .header-badge span { color: #86efac; font-size: 8px; }
+
+  /* ── CARD ── */
+  .card {
+    max-width: 680px;
+    margin: 28px auto 0;
+    padding: 0 16px;
+  }
+
+  .section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .section-head {
+    background: var(--oak-pale);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 28px; height: 28px;
+    background: var(--oak);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--oak);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+  }
+  .section-body { padding: 20px; }
+
+  /* ── FIELDS ── */
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  label .req { color: var(--error); margin-left: 2px; }
+  label .hint {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #9ca3af;
+    font-size: 10px;
+    margin-left: 4px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: #fafaf9;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--oak);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(74,31,96,0.1);
+  }
+  input.error, select.error {
+    border-color: var(--error);
+    background: var(--error-bg);
+  }
+  input[type="number"] { font-family: 'DM Mono', monospace; }
+
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 11px;
+    pointer-events: none;
+  }
+  select { padding-right: 30px; cursor: pointer; }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  .err-msg {
+    font-size: 10px;
+    color: var(--error);
+    margin-top: 4px;
+    display: none;
+  }
+  .field.has-error .err-msg { display: block; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 20px;
+  }
+
+  /* ── NOTA INFORMATIVA ── */
+  .info-note {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: #92400e;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-area {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: var(--oak);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(74,31,96,0.35);
+    letter-spacing: 0.3px;
+  }
+  .btn-submit:hover { background: #5e2a7a; box-shadow: 0 6px 18px rgba(74,31,96,0.4); }
+  .btn-submit:active { transform: scale(0.99); }
+  .btn-submit:disabled { background: #a48ab8; box-shadow: none; cursor: not-allowed; }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    display: none;
+    max-width: 680px;
+    margin: 48px auto 0;
+    padding: 0 16px;
+    text-align: center;
+  }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--green-bg);
+    border: 2px solid var(--green-bd);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 20px;
+  }
+  .success-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--oak);
+    margin-bottom: 8px;
+  }
+  .success-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .success-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: left;
+    margin-bottom: 16px;
+  }
+  .success-card-head {
+    background: var(--oak);
+    color: white;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .copy-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.25); }
+  .copy-btn.copied { background: var(--green); border-color: var(--green); }
+
+  .email-body-preview {
+    padding: 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: #374151;
+    white-space: pre-wrap;
+    background: #fafaf9;
+    border-top: 1px solid var(--border);
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .btn-nuevo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 24px;
+    background: transparent;
+    border: 1.5px solid var(--oak);
+    color: var(--oak);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-nuevo:hover { background: var(--oak-pale); }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 32px;
+    letter-spacing: 0.3px;
+  }
+
+  @media (max-width: 560px) {
+    .row2, .row3 { grid-template-columns: 1fr; gap: 0; }
+    .header-title { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow">Oakberry Latam · CXP</div>
+    <h1 class="header-title">Alta de Proveedor</h1>
+    <p class="header-sub">Completá el formulario con los datos del proveedor.<br>Al enviarlo, llegará una notificación a Cuentas por Pagar.</p>
+    <div class="header-badge"><span>●</span> Información enviada de forma segura</div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="formView">
+<form id="provForm" novalidate>
+  <div class="card">
+
+    <!-- DATOS GENERALES -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon">🏢</div>
+        <span class="section-title">Datos del Proveedor</span>
+      </div>
+      <div class="section-body">
+
+        <div class="field" id="f-nombre">
+          <label>Nombre / Razón Social <span class="req">*</span></label>
+          <input type="text" id="nombre" placeholder="Ej: Distribuidora Valle Verde S.A." autocomplete="organization">
+          <div class="err-msg">Este campo es requerido</div>
+        </div>
+
+        <div class="row2">
+          <div class="field" id="f-pais">
+            <label>País <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="pais">
+                <option value="">Seleccionar…</option>
+                <option value="Costa Rica">🇨🇷 Costa Rica</option>
+                <option value="Panama">🇵🇦 Panamá</option>
+                <option value="Guatemala">🇬🇹 Guatemala</option>
+                <option value="El Salvador">🇸🇻 El Salvador</option>
+                <option value="Internacional">🌎 Internacional</option>
+              </select>
+            </div>
+            <div class="err-msg">Seleccioná un país</div>
+          </div>
+          <div class="field">
+            <label>Días de Crédito <span class="hint">(0 = contado)</span></label>
+            <input type="number" id="diasCredito" placeholder="30" min="0" max="180" class="mono">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DATOS BANCARIOS -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon">🏦</div>
+        <span class="section-title">Datos Bancarios</span>
+      </div>
+      <div class="section-body">
+
+        <div class="info-note">
+          ⚠️ Asegurate de que los datos bancarios sean exactos. Serán usados para procesar pagos directamente.
+        </div>
+
+        <div class="field" id="f-cuenta">
+          <label>Número de Cuenta / IBAN <span class="req">*</span></label>
+          <input type="text" id="cuenta" placeholder="Ej: CR66010200009639961863" class="mono"
+                 autocomplete="off" spellcheck="false">
+          <div class="err-msg">Este campo es requerido</div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Banco <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select id="banco">
+                <option value="">Seleccionar…</option>
+                <optgroup label="Costa Rica">
+                  <option>BAC San Jose</option>
+                  <option>BCR</option>
+                  <option>Banco Nacional</option>
+                  <option>Banco Promerica</option>
+                  <option>Banco Popular</option>
+                  <option>Davivienda</option>
+                  <option>Scotiabank</option>
+                  <option>Banco BCT</option>
+                </optgroup>
+                <optgroup label="Panamá">
+                  <option>Banco General</option>
+                  <option>BAC Panama</option>
+                  <option>Banistmo</option>
+                  <option>Citi Bank NA NY</option>
+                </optgroup>
+                <optgroup label="Internacional / Otro">
+                  <option>BANCO DO BRASIL S.A.</option>
+                  <option>Otro</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Código SWIFT / BIC <span class="hint">(internacional)</span></label>
+            <input type="text" id="swift" placeholder="Ej: BSNJCRSJ" class="mono"
+                   autocomplete="off" spellcheck="false" maxlength="11">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Moneda de la cuenta</label>
+          <div class="select-wrap">
+            <select id="moneda">
+              <option value="CRC">CRC — Colones costarricenses</option>
+              <option value="USD">USD — Dólares estadounidenses</option>
+              <option value="GTQ">GTQ — Quetzales guatemaltecos</option>
+              <option value="EUR">EUR — Euros</option>
+              <option value="BRL">BRL — Reales brasileños</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONTACTO -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon">👤</div>
+        <span class="section-title">Contacto</span>
+      </div>
+      <div class="section-body">
+        <div class="row2">
+          <div class="field">
+            <label>Nombre del Contacto</label>
+            <input type="text" id="contacto" placeholder="Ej: Juan Pérez">
+          </div>
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="tel" id="telefono" placeholder="+506 8888-0000">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email del Proveedor</label>
+          <input type="email" id="emailProv" placeholder="pagos@proveedor.com">
+        </div>
+        <div class="field">
+          <label>Notas adicionales</label>
+          <textarea id="notas" placeholder="Condiciones especiales, referencias, instrucciones de pago, etc."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <div class="submit-area">
+    <button type="submit" class="btn-submit" id="btnSubmit">
+      Enviar solicitud de alta →
+    </button>
+  </div>
+
+</form>
+</div><!-- /formView -->
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successView">
+  <div class="success-icon">✅</div>
+  <h2 class="success-title">¡Solicitud enviada!</h2>
+  <p class="success-sub">Los datos del proveedor fueron enviados a <strong>factura@oaklatam.com</strong>.<br>El equipo de Cuentas por Pagar los registrará en el sistema.</p>
+
+  <div class="success-card">
+    <div class="success-card-head">
+      <span>📋 Texto para copiar al Sheet</span>
+      <button class="copy-btn" id="copyBtn" onclick="copiarTexto()">Copiar</button>
+    </div>
+    <div class="email-body-preview" id="emailPreview"></div>
+  </div>
+
+  <button class="btn-nuevo" onclick="reiniciar()">← Registrar otro proveedor</button>
+
+  <div class="footer" style="margin-top:24px">
+    Oakberry Latam · Cuentas x Pagar Centroamérica
+  </div>
+</div>
+
+<script>
+// ── CAMPOS REQUERIDOS ──────────────────────────────────────────
+const reqs = [
+  { id: 'nombre',  fid: 'f-nombre' },
+  { id: 'pais',    fid: 'f-pais' },
+  { id: 'cuenta',  fid: 'f-cuenta' },
+];
+
+reqs.forEach(({ id, fid }) => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.getElementById(fid).classList.remove('has-error');
+    document.getElementById(id).classList.remove('error');
+  });
+});
+
+function validar() {
+  let ok = true;
+  reqs.forEach(({ id, fid }) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      document.getElementById(fid).classList.add('has-error');
+      el.classList.add('error');
+      ok = false;
+    }
+  });
+  return ok;
+}
+
+// ── GENERAR ID ────────────────────────────────────────────────
+function generarId() {
+  // ID basado en timestamp para unicidad
+  const n = Math.floor(Math.random() * 900) + 100;
+  return 'PROV-' + n;
+}
+
+// ── CONSTRUIR TEXTO COPY-PASTE ────────────────────────────────
+function construirTexto(datos, id) {
+  const sep = '\t'; // tabulación para pegar directo en Sheets
+  const linea = [
+    id,
+    datos.nombre,
+    datos.pais,
+    datos.cuenta,
+    datos.swift    || '',
+    datos.banco    || '',
+    datos.diasCredito !== '' ? datos.diasCredito : '0',
+  ].join(sep);
+
+  const texto =
+`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SOLICITUD DE ALTA DE PROVEEDOR — Oakberry Latam
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆔  ID sugerido   : ${id}
+🏢  Razón Social  : ${datos.nombre}
+🌎  País          : ${datos.pais}
+🏦  Cuenta / IBAN : ${datos.cuenta}
+🔀  SWIFT / BIC   : ${datos.swift || '—'}
+🏛️  Banco         : ${datos.banco || '—'}
+💵  Moneda        : ${datos.moneda}
+📅  Días crédito  : ${datos.diasCredito || '0'} días
+${datos.contacto ? `\n👤  Contacto      : ${datos.contacto}` : ''}${datos.telefono ? `\n📞  Teléfono      : ${datos.telefono}` : ''}${datos.emailProv ? `\n✉️  Email         : ${datos.emailProv}` : ''}${datos.notas ? `\n📝  Notas         : ${datos.notas}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FILA PARA PEGAR EN GOOGLE SHEETS
+(pegar en la columna A de la hoja Proveedores)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${linea}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Enviado: ${new Date().toLocaleString('es-CR', {timeZone:'America/Costa_Rica'})}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  return texto;
+}
+
+// ── CONSTRUIR HTML DEL CORREO ─────────────────────────────────
+function construirHtmlCorreo(datos, id) {
+  const bans = {'Costa Rica':'🇨🇷','Panama':'🇵🇦','Guatemala':'🇬🇹','El Salvador':'🇸🇻','Internacional':'🌎'};
+  const flag = bans[datos.pais] || '🌎';
+  const sep  = '\t';
+  const fila = [id, datos.nombre, datos.pais, datos.cuenta, datos.swift||'', datos.banco||'', datos.diasCredito||'0'].join(sep);
+
+  return `
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f7f4fa;font-family:'Segoe UI',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4fa;padding:28px 0">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(74,31,96,0.12)">
+
+  <tr><td style="background:#280532;padding:28px 32px">
+    <p style="margin:0 0 6px;font-size:10px;color:#b085d0;letter-spacing:2px;text-transform:uppercase">Oakberry Latam · CXP Centroamérica</p>
+    <h1 style="margin:0;color:white;font-size:22px;font-weight:700">🏢 Solicitud de Alta de Proveedor</h1>
+  </td></tr>
+
+  <tr><td style="padding:24px 32px 0">
+    <table cellpadding="0" cellspacing="0">
+      <tr><td style="background:#f3edf7;border-left:4px solid #4a1f60;border-radius:6px;padding:10px 18px">
+        <span style="display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596">ID Sugerido</span>
+        <span style="font-size:24px;font-weight:800;color:#4a1f60;font-family:monospace">${id}</span>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:20px 32px 0">
+    <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Datos del Proveedor</p>
+    <table width="100%" cellpadding="0" cellspacing="6">
+      <tr>
+        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Razón Social</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.nombre}</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">País</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${flag} ${datos.pais}</span></td>
+      </tr>
+      <tr>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Días de Crédito</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.diasCredito||'0'} días</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Moneda</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.moneda}</span></td>
+      </tr>
+    </table>
+  </td></tr>
+
+  <tr><td style="padding:20px 32px 0">
+    <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Datos Bancarios</p>
+    <table width="100%" cellpadding="0" cellspacing="6">
+      <tr><td colspan="2" style="padding:5px 0">
+        <span style="display:block;font-size:9px;color:#9ca3af">Cuenta / IBAN</span>
+        <span style="font-size:13px;font-weight:600;color:#1a1a2e;font-family:monospace;background:#f7f4fa;padding:4px 8px;border-radius:4px;display:inline-block;margin-top:2px">${datos.cuenta}</span>
+      </td></tr>
+      <tr>
+        <td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Banco</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">${datos.banco||'—'}</span></td>
+        <td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">SWIFT / BIC</span><span style="font-size:14px;font-weight:600;color:#1a1a2e;font-family:monospace">${datos.swift||'—'}</span></td>
+      </tr>
+    </table>
+  </td></tr>
+
+  ${(datos.contacto||datos.telefono||datos.emailProv) ? `
+  <tr><td style="padding:20px 32px 0">
+    <p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Contacto</p>
+    <table width="100%" cellpadding="0" cellspacing="6">
+      <tr>
+        ${datos.contacto ? `<td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Nombre</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.contacto}</span></td>` : '<td></td>'}
+        ${datos.telefono ? `<td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Teléfono</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.telefono}</span></td>` : '<td></td>'}
+      </tr>
+      ${datos.emailProv ? `<tr><td colspan="2" style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Email</span><span style="font-size:13px;font-weight:600;color:#1a1a2e">${datos.emailProv}</span></td></tr>` : ''}
+    </table>
+  </td></tr>` : ''}
+
+  ${datos.notas ? `
+  <tr><td style="padding:20px 32px 0">
+    <p style="margin:0 0 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Notas</p>
+    <p style="margin:0;font-size:12px;color:#4b5563;line-height:1.6;background:#fafaf9;border-radius:6px;padding:10px 12px">${datos.notas}</p>
+  </td></tr>` : ''}
+
+  <tr><td style="padding:20px 32px">
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px">
+      <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#92400e">📋 FILA PARA PEGAR EN GOOGLE SHEETS</p>
+      <p style="margin:0 0 8px;font-size:10px;color:#92400e">Copiar y pegar en la columna A de la hoja <strong>Proveedores</strong>:</p>
+      <div style="font-family:monospace;font-size:10px;background:#fef3c7;border-radius:4px;padding:8px 10px;word-break:break-all;color:#1a1a2e">${fila.replace(/\t/g, ' | ')}</div>
+      <p style="margin:8px 0 0;font-size:9px;color:#b45309">Columnas: ID | Nombre | País | Cuenta | Swift | Banco | Días Crédito</p>
+    </div>
+  </td></tr>
+
+  <tr><td style="background:#280532;padding:14px 32px;text-align:center">
+    <p style="margin:0;font-size:10px;color:#9d7ab8">Oakberry Latam · Sistema de Gestión de Proveedores</p>
+    <p style="margin:3px 0 0;font-size:9px;color:#6b4e8a">Generado automáticamente · No responder a este correo</p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
+// ── ENVÍO ─────────────────────────────────────────────────────
+let textoFinal = '';
+
+document.getElementById('provForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  if (!validar()) {
+    document.querySelector('.has-error input, .has-error select').focus();
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  const datos = {
+    nombre:      document.getElementById('nombre').value.trim(),
+    pais:        document.getElementById('pais').value,
+    cuenta:      document.getElementById('cuenta').value.trim().toUpperCase(),
+    swift:       document.getElementById('swift').value.trim().toUpperCase(),
+    banco:       document.getElementById('banco').value,
+    moneda:      document.getElementById('moneda').value,
+    diasCredito: document.getElementById('diasCredito').value.trim(),
+    contacto:    document.getElementById('contacto').value.trim(),
+    telefono:    document.getElementById('telefono').value.trim(),
+    emailProv:   document.getElementById('emailProv').value.trim(),
+    notas:       document.getElementById('notas').value.trim(),
+  };
+
+  const id = generarId();
+  textoFinal = construirTexto(datos, id);
+  const htmlCorreo = construirHtmlCorreo(datos, id);
+
+  // Enviar vía mailto (fallback) — en producción reemplazar con fetch a GAS
+  const asunto = encodeURIComponent(`[Oakberry] Alta de Proveedor: ${datos.nombre} (${id})`);
+  const cuerpo = encodeURIComponent(textoFinal);
+
+  // Intento de mailto
+  const mailtoLink = `mailto:factura@oaklatam.com?subject=${asunto}&body=${cuerpo}`;
+  window.location.href = mailtoLink;
+
+  // Mostrar pantalla de éxito independientemente
+  setTimeout(() => {
+    document.getElementById('formView').style.display = 'none';
+    const sv = document.getElementById('successView');
+    sv.style.display = 'block';
+    document.getElementById('emailPreview').textContent = textoFinal;
+    btn.disabled = false;
+    btn.textContent = 'Enviar solicitud de alta →';
+  }, 600);
+});
+
+// ── COPIAR TEXTO ──────────────────────────────────────────────
+function copiarTexto() {
+  navigator.clipboard.writeText(textoFinal).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '¡Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+
+// ── REINICIAR ─────────────────────────────────────────────────
+function reiniciar() {
+  document.getElementById('provForm').reset();
+  document.getElementById('successView').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
