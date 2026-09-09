@@ -89,6 +89,11 @@
           <input type="text" id="nombre" placeholder="Ej: Distribuidora Valle Verde S.A." autocomplete="organization">
           <div class="err-msg">Este campo es requerido</div>
         </div>
+        <div class="field" id="f-identificacion">
+          <label>Identificación <span class="req">*</span> <span class="hint">(cédula jurídica/física, RUC o NIT según el país)</span></label>
+          <input type="text" id="identificacion" placeholder="Ej: 3-101-123456" class="mono" autocomplete="off">
+          <div class="err-msg">Este campo es requerido</div>
+        </div>
         <div class="row2">
           <div class="field" id="f-pais">
             <label>País <span class="req">*</span></label>
@@ -216,9 +221,10 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbxv1m0BjoK4u3xmDyiU3s-L
 const CXP_URL = 'https://cxp-oaklatam.vercel.app/api/proveedores/solicitudes';
 
 const reqs = [
-  { id: 'nombre', fid: 'f-nombre' },
-  { id: 'pais',   fid: 'f-pais'   },
-  { id: 'cuenta', fid: 'f-cuenta' },
+  { id: 'nombre',         fid: 'f-nombre' },
+  { id: 'identificacion', fid: 'f-identificacion' },
+  { id: 'pais',           fid: 'f-pais'   },
+  { id: 'cuenta',         fid: 'f-cuenta' },
 ];
 reqs.forEach(({ id, fid }) => {
   document.getElementById(id).addEventListener('input', () => {
@@ -254,6 +260,7 @@ function construirTexto(datos, id) {
     + '================================================\n'
     + 'ID sugerido   : ' + id + '\n'
     + 'Razon Social  : ' + datos.nombre + '\n'
+    + 'Identificacion: ' + datos.identificacion + '\n'
     + 'Pais          : ' + datos.pais + '\n'
     + 'Cuenta / IBAN : ' + datos.cuenta + '\n'
     + 'SWIFT / BIC   : ' + (datos.swift || '-') + '\n'
@@ -344,7 +351,8 @@ document.getElementById('provForm').addEventListener('submit', function(e) {
   btn.textContent = 'Enviando…';
 
   var datos = {
-    nombre:      document.getElementById('nombre').value.trim(),
+    nombre:         document.getElementById('nombre').value.trim(),
+    identificacion: document.getElementById('identificacion').value.trim(),
     pais:        document.getElementById('pais').value,
     cuenta:      document.getElementById('cuenta').value.trim().toUpperCase(),
     swift:       document.getElementById('swift').value.trim().toUpperCase(),
