@@ -45,6 +45,10 @@
   .err-msg{font-size:10px;color:var(--error);margin-top:4px;display:none;}
   .field.has-error .err-msg{display:block;}
   .info-note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;font-size:11px;color:#92400e;line-height:1.5;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start;}
+  .pago-toggle{display:flex;gap:4px;background:var(--oak-pale);border-radius:9px;padding:4px;margin-bottom:16px;}
+  .pago-toggle-btn{flex:1;border:none;background:transparent;padding:9px 10px;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;color:var(--oak-light);border-radius:7px;cursor:pointer;transition:background .15s,color .15s,box-shadow .15s;}
+  .pago-toggle-btn.active{background:var(--white);color:var(--oak);box-shadow:0 1px 3px rgba(74,31,96,0.15);}
+  .tarjeta-note{background:var(--oak-pale);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:12px;color:var(--oak-light);line-height:1.5;display:flex;gap:8px;align-items:flex-start;}
   .submit-area{max-width:680px;margin:0 auto;padding:0 16px;}
   .btn-submit{width:100%;padding:15px;background:var(--oak);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s,transform .1s,box-shadow .15s;box-shadow:0 4px 14px rgba(74,31,96,0.35);letter-spacing:0.3px;}
   .btn-submit:hover{background:#5e2a7a;box-shadow:0 6px 18px rgba(74,31,96,0.4);}
@@ -101,7 +105,7 @@
               <select id="pais">
                 <option value="">Seleccionar…</option>
                 <option value="Costa Rica">🇨🇷 Costa Rica</option>
-                <option value="Panama">🇵🇦 Panamá</option>
+                <option value="Panamá">🇵🇦 Panamá</option>
                 <option value="Guatemala">🇬🇹 Guatemala</option>
                 <option value="El Salvador">🇸🇻 El Salvador</option>
                 <option value="Internacional">🌎 Internacional</option>
@@ -120,49 +124,60 @@
     <div class="section">
       <div class="section-head"><div class="section-icon">🏦</div><span class="section-title">Datos Bancarios</span></div>
       <div class="section-body">
-        <div class="info-note">⚠️ Asegurate de que los datos bancarios sean exactos. Serán usados para procesar pagos directamente.</div>
-        <div class="field" id="f-cuenta">
-          <label>Número de Cuenta / IBAN <span class="req">*</span></label>
-          <input type="text" id="cuenta" placeholder="Ej: CR66010200009639961863" class="mono" autocomplete="off" spellcheck="false">
-          <div class="err-msg">Este campo es requerido</div>
+        <div class="pago-toggle">
+          <button type="button" class="pago-toggle-btn active" id="btnPagoTransferencia" onclick="setMetodoPago('transferencia')">Datos bancarios</button>
+          <button type="button" class="pago-toggle-btn" id="btnPagoTarjeta" onclick="setMetodoPago('tarjeta_credito')">💳 Tarjeta de crédito</button>
         </div>
-        <div class="row2">
-          <div class="field">
-            <label>Banco</label>
-            <div class="select-wrap">
-              <select id="banco">
-                <option value="">Seleccionar…</option>
-                <optgroup label="Costa Rica">
-                  <option>BAC San Jose</option><option>BCR</option><option>Banco Nacional</option>
-                  <option>Banco Promerica</option><option>Banco Popular</option>
-                  <option>Davivienda</option><option>Scotiabank</option><option>Banco BCT</option>
-                </optgroup>
-                <optgroup label="Panamá">
-                  <option>Banco General</option><option>BAC Panama</option>
-                  <option>Banistmo</option><option>Citi Bank NA NY</option>
-                </optgroup>
-                <optgroup label="Internacional / Otro">
-                  <option>BANCO DO BRASIL S.A.</option><option>Otro</option>
-                </optgroup>
-              </select>
+
+        <div id="bloqueBancario">
+          <div class="info-note">⚠️ Asegurate de que los datos bancarios sean exactos. Serán usados para procesar pagos directamente.</div>
+          <div class="field" id="f-cuenta">
+            <label>Número de Cuenta / IBAN <span class="req">*</span></label>
+            <input type="text" id="cuenta" placeholder="Ej: CR66010200009639961863" class="mono" autocomplete="off" spellcheck="false">
+            <div class="err-msg">Este campo es requerido</div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Banco</label>
+              <div class="select-wrap">
+                <select id="banco">
+                  <option value="">Seleccionar…</option>
+                  <optgroup label="Costa Rica">
+                    <option>BAC San Jose</option><option>BCR</option><option>Banco Nacional</option>
+                    <option>Banco Promerica</option><option>Banco Popular</option>
+                    <option>Davivienda</option><option>Scotiabank</option><option>Banco BCT</option>
+                  </optgroup>
+                  <optgroup label="Panamá">
+                    <option>Banco General</option><option>BAC Panama</option>
+                    <option>Banistmo</option><option>Citi Bank NA NY</option>
+                  </optgroup>
+                  <optgroup label="Internacional / Otro">
+                    <option>BANCO DO BRASIL S.A.</option><option>Otro</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Código SWIFT / BIC <span class="hint">(internacional)</span></label>
+              <input type="text" id="swift" placeholder="Ej: BSNJCRSJ" class="mono" autocomplete="off" spellcheck="false" maxlength="11">
             </div>
           </div>
           <div class="field">
-            <label>Código SWIFT / BIC <span class="hint">(internacional)</span></label>
-            <input type="text" id="swift" placeholder="Ej: BSNJCRSJ" class="mono" autocomplete="off" spellcheck="false" maxlength="11">
+            <label>Moneda de la cuenta</label>
+            <div class="select-wrap">
+              <select id="moneda">
+                <option value="CRC">CRC — Colones costarricenses</option>
+                <option value="USD">USD — Dólares estadounidenses</option>
+                <option value="GTQ">GTQ — Quetzales guatemaltecos</option>
+                <option value="EUR">EUR — Euros</option>
+                <option value="BRL">BRL — Reales brasileños</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label>Moneda de la cuenta</label>
-          <div class="select-wrap">
-            <select id="moneda">
-              <option value="CRC">CRC — Colones costarricenses</option>
-              <option value="USD">USD — Dólares estadounidenses</option>
-              <option value="GTQ">GTQ — Quetzales guatemaltecos</option>
-              <option value="EUR">EUR — Euros</option>
-              <option value="BRL">BRL — Reales brasileños</option>
-            </select>
-          </div>
+
+        <div id="bloqueTarjeta" class="tarjeta-note" style="display:none">
+          💳 Este proveedor se paga con tarjeta de crédito corporativa — no hace falta cargar datos bancarios.
         </div>
       </div>
     </div>
@@ -220,11 +235,26 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbxv1m0BjoK4u3xmDyiU3s-L
 //    aceptarla/rechazarla desde la sección Proveedores de la app ──
 const CXP_URL = 'https://cxp-oaklatam.vercel.app/api/proveedores/solicitudes';
 
+// 'transferencia' (con cuenta bancaria requerida) o 'tarjeta_credito'
+// (sin datos bancarios) — controla qué campos se piden y se validan.
+var metodoPagoActual = 'transferencia';
+function setMetodoPago(valor) {
+  metodoPagoActual = valor;
+  document.getElementById('btnPagoTransferencia').classList.toggle('active', valor === 'transferencia');
+  document.getElementById('btnPagoTarjeta').classList.toggle('active', valor === 'tarjeta_credito');
+  document.getElementById('bloqueBancario').style.display = valor === 'transferencia' ? '' : 'none';
+  document.getElementById('bloqueTarjeta').style.display = valor === 'tarjeta_credito' ? 'flex' : 'none';
+  if (valor === 'tarjeta_credito') {
+    document.getElementById('f-cuenta').classList.remove('has-error');
+    document.getElementById('cuenta').classList.remove('error');
+  }
+}
+
 const reqs = [
   { id: 'nombre',         fid: 'f-nombre' },
   { id: 'identificacion', fid: 'f-identificacion' },
   { id: 'pais',           fid: 'f-pais'   },
-  { id: 'cuenta',         fid: 'f-cuenta' },
+  { id: 'cuenta',         fid: 'f-cuenta', soloSi: function() { return metodoPagoActual === 'transferencia'; } },
 ];
 reqs.forEach(({ id, fid }) => {
   document.getElementById(id).addEventListener('input', () => {
@@ -235,6 +265,7 @@ reqs.forEach(({ id, fid }) => {
 function validar() {
   var ok = true;
   reqs.forEach(function(r) {
+    if (r.soloSi && !r.soloSi()) return;
     var el = document.getElementById(r.id);
     if (!el.value.trim()) {
       document.getElementById(r.fid).classList.add('has-error');
@@ -249,22 +280,29 @@ function generarId() {
   return 'PROV-' + (Math.floor(Math.random() * 900) + 100);
 }
 
+function cuentaParaMostrar(datos) {
+  return datos.metodoPago === 'tarjeta_credito' ? 'TARJETA DE CREDITO CORPORATIVA' : datos.cuenta;
+}
+
 function construirFila(datos, id) {
-  return [id, datos.nombre, datos.pais, datos.cuenta,
+  return [id, datos.nombre, datos.pais, cuentaParaMostrar(datos),
           datos.swift || '', datos.banco || '',
           datos.diasCredito || '0'].join('\t');
 }
 
 function construirTexto(datos, id) {
+  var cuentaTxt = cuentaParaMostrar(datos);
   return 'SOLICITUD DE ALTA DE PROVEEDOR - Oakberry Latam\n'
     + '================================================\n'
     + 'ID sugerido   : ' + id + '\n'
     + 'Razon Social  : ' + datos.nombre + '\n'
     + 'Identificacion: ' + datos.identificacion + '\n'
     + 'Pais          : ' + datos.pais + '\n'
-    + 'Cuenta / IBAN : ' + datos.cuenta + '\n'
-    + 'SWIFT / BIC   : ' + (datos.swift || '-') + '\n'
-    + 'Banco         : ' + (datos.banco || '-') + '\n'
+    + 'Metodo pago   : ' + (datos.metodoPago === 'tarjeta_credito' ? 'Tarjeta de credito corporativa' : 'Transferencia bancaria') + '\n'
+    + 'Cuenta / IBAN : ' + cuentaTxt + '\n'
+    + (datos.metodoPago === 'tarjeta_credito' ? '' :
+        'SWIFT / BIC   : ' + (datos.swift || '-') + '\n'
+      + 'Banco         : ' + (datos.banco || '-') + '\n')
     + 'Moneda        : ' + datos.moneda + '\n'
     + 'Dias credito  : ' + (datos.diasCredito || '0') + ' dias\n'
     + (datos.contacto ? 'Contacto      : ' + datos.contacto + '\n' : '')
@@ -273,7 +311,7 @@ function construirTexto(datos, id) {
     + (datos.notas    ? 'Notas         : ' + datos.notas + '\n' : '')
     + '================================================\n'
     + 'Columnas: ID | Nombre | Pais | Cuenta | Swift | Banco | Dias Credito\n'
-    + [id,datos.nombre,datos.pais,datos.cuenta,datos.swift||'',datos.banco||'',datos.diasCredito||'0'].join(' | ') + '\n'
+    + [id,datos.nombre,datos.pais,cuentaTxt,datos.swift||'',datos.banco||'',datos.diasCredito||'0'].join(' | ') + '\n'
     + '================================================\n'
     + 'Enviado: ' + new Date().toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' });
 }
@@ -281,7 +319,9 @@ function construirTexto(datos, id) {
 function construirHtmlCorreo(datos, id) {
   var flags = { 'Costa Rica':'CR','Panama':'PA','Guatemala':'GT','El Salvador':'SV','Internacional':'INTL' };
   var flag = flags[datos.pais] || '';
-  var fila = [id,datos.nombre,datos.pais,datos.cuenta,datos.swift||'',datos.banco||'',datos.diasCredito||'0'].join(' | ');
+  var esTarjeta = datos.metodoPago === 'tarjeta_credito';
+  var cuentaTxt = cuentaParaMostrar(datos);
+  var fila = [id,datos.nombre,datos.pais,cuentaTxt,datos.swift||'',datos.banco||'',datos.diasCredito||'0'].join(' | ');
   return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>'
     + '<body style="margin:0;padding:0;background:#f7f4fa;font-family:Segoe UI,Arial,sans-serif">'
     + '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f4fa;padding:28px 0"><tr><td align="center">'
@@ -306,10 +346,13 @@ function construirHtmlCorreo(datos, id) {
     + '<tr><td style="padding:20px 32px 0">'
     + '<p style="margin:0 0 10px;font-size:9px;font-weight:700;text-transform:uppercase;color:#7d5596;border-bottom:2px solid #f3edf7;padding-bottom:6px">Datos Bancarios</p>'
     + '<table width="100%" cellpadding="0" cellspacing="6">'
-    + '<tr><td colspan="2" style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Cuenta / IBAN</span>'
-    + '<span style="font-size:13px;font-weight:600;color:#1a1a2e;font-family:monospace;background:#f7f4fa;padding:4px 8px;border-radius:4px;display:inline-block;margin-top:2px">' + datos.cuenta + '</span></td></tr>'
-    + '<tr><td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Banco</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">' + (datos.banco||'-') + '</span></td>'
-    + '<td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">SWIFT / BIC</span><span style="font-size:14px;font-weight:600;color:#1a1a2e;font-family:monospace">' + (datos.swift||'-') + '</span></td></tr>'
+    + (esTarjeta
+        ? '<tr><td colspan="2" style="padding:5px 0"><span style="font-size:14px;font-weight:700;color:#4a1f60">💳 Tarjeta de credito corporativa</span>'
+          + '<span style="display:block;font-size:11px;color:#6b7280;margin-top:2px">No requiere cuenta bancaria.</span></td></tr>'
+        : '<tr><td colspan="2" style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Cuenta / IBAN</span>'
+          + '<span style="font-size:13px;font-weight:600;color:#1a1a2e;font-family:monospace;background:#f7f4fa;padding:4px 8px;border-radius:4px;display:inline-block;margin-top:2px">' + cuentaTxt + '</span></td></tr>'
+          + '<tr><td style="width:48%;padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">Banco</span><span style="font-size:14px;font-weight:600;color:#1a1a2e">' + (datos.banco||'-') + '</span></td>'
+          + '<td style="padding:5px 0"><span style="display:block;font-size:9px;color:#9ca3af">SWIFT / BIC</span><span style="font-size:14px;font-weight:600;color:#1a1a2e;font-family:monospace">' + (datos.swift||'-') + '</span></td></tr>')
     + '</table></td></tr>'
     + (datos.contacto||datos.telefono||datos.emailProv ?
         '<tr><td style="padding:20px 32px 0">'
@@ -350,13 +393,15 @@ document.getElementById('provForm').addEventListener('submit', function(e) {
   btn.disabled = true;
   btn.textContent = 'Enviando…';
 
+  var esTarjetaCredito = metodoPagoActual === 'tarjeta_credito';
   var datos = {
     nombre:         document.getElementById('nombre').value.trim(),
     identificacion: document.getElementById('identificacion').value.trim(),
     pais:        document.getElementById('pais').value,
-    cuenta:      document.getElementById('cuenta').value.trim().toUpperCase(),
-    swift:       document.getElementById('swift').value.trim().toUpperCase(),
-    banco:       document.getElementById('banco').value,
+    metodoPago:  metodoPagoActual,
+    cuenta:      esTarjetaCredito ? '' : document.getElementById('cuenta').value.trim().toUpperCase(),
+    swift:       esTarjetaCredito ? '' : document.getElementById('swift').value.trim().toUpperCase(),
+    banco:       esTarjetaCredito ? '' : document.getElementById('banco').value,
     moneda:      document.getElementById('moneda').value,
     diasCredito: document.getElementById('diasCredito').value.trim(),
     contacto:    document.getElementById('contacto').value.trim(),
@@ -430,6 +475,7 @@ function copiarFila() {
 
 function reiniciar() {
   document.getElementById('provForm').reset();
+  setMetodoPago('transferencia');
   document.getElementById('successView').style.display = 'none';
   document.getElementById('formView').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
