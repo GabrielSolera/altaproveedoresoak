@@ -161,6 +161,11 @@
                   </optgroup>
                 </select>
               </div>
+              <div class="field" id="f-banco-otro" style="display:none;margin-top:8px">
+                <label>Especificá el banco <span class="req">*</span></label>
+                <input type="text" id="banco-otro" placeholder="Nombre del banco" autocomplete="off">
+                <div class="err-msg">Este campo es requerido</div>
+              </div>
             </div>
             <div class="field">
               <label>Código SWIFT / BIC <span class="hint">(internacional)</span></label>
@@ -260,7 +265,24 @@ const reqs = [
   { id: 'identificacion', fid: 'f-identificacion' },
   { id: 'pais',           fid: 'f-pais'   },
   { id: 'cuenta',         fid: 'f-cuenta', soloSi: function() { return metodoPagoActual === 'transferencia'; } },
+  { id: 'banco-otro',     fid: 'f-banco-otro', soloSi: function() {
+      return metodoPagoActual === 'transferencia' && document.getElementById('banco').value === 'Otro';
+    } },
 ];
+
+// "Otro" en el select de banco despliega un campo de texto para que la
+// persona escriba el nombre real — si no, quedaba guardado literalmente
+// como "Otro" sin saber cuál banco es.
+document.getElementById('banco').addEventListener('change', function() {
+  var esOtro = this.value === 'Otro';
+  var campo = document.getElementById('f-banco-otro');
+  campo.style.display = esOtro ? 'block' : 'none';
+  if (!esOtro) {
+    document.getElementById('banco-otro').value = '';
+    campo.classList.remove('has-error');
+    document.getElementById('banco-otro').classList.remove('error');
+  }
+});
 reqs.forEach(({ id, fid }) => {
   document.getElementById(id).addEventListener('input', () => {
     document.getElementById(fid).classList.remove('has-error');
@@ -406,7 +428,11 @@ document.getElementById('provForm').addEventListener('submit', function(e) {
     metodoPago:  metodoPagoActual,
     cuenta:      esTarjetaCredito ? '' : document.getElementById('cuenta').value.trim().toUpperCase(),
     swift:       esTarjetaCredito ? '' : document.getElementById('swift').value.trim().toUpperCase(),
-    banco:       esTarjetaCredito ? '' : document.getElementById('banco').value,
+    banco:       esTarjetaCredito ? '' : (
+                   document.getElementById('banco').value === 'Otro'
+                     ? document.getElementById('banco-otro').value.trim()
+                     : document.getElementById('banco').value
+                 ),
     moneda:      document.getElementById('moneda').value,
     diasCredito: document.getElementById('diasCredito').value.trim(),
     contacto:    document.getElementById('contacto').value.trim(),
